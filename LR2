@@ -1,0 +1,120 @@
+#Варіант 9. Розробити підсистему для завантаження збереження гри в 2D. Описати клас для 
+#створення NPC (Ім'я, координати x та y, кількість життів) та декорацій ( вид, наприклад, камінь, дерево та координати) .
+# Передбачити існування підводних та наземних рівнів. Врахувати, що підводні NPC не можуть взаємодіяти з наземними декораціями і навпаки.
+# Система отримє список об'єктів, вид рівня (наземний чи підводний) 
+#та розміри карти, а повертає рівень гри - .двовимірний масив із розставленими об'єктами.
+from __future__ import annotations
+from abc import ABC, abstractmethod
+import random
+
+class NPC(ABC):
+    def __init__(self, name:str, x:int, y:int, hp:int)->None:
+        self.name: str = name
+        self.x:int = x
+        self.y:int = y
+        self.hp:int = hp
+
+    @abstractmethod
+    def info(self)-> str:
+        pass
+
+class Decoration(ABC):
+    def __init__(self, type_name:str, x:int, y:int)->None:
+        self.type_name:str = type_name
+        self.x:int = x
+        self.y:int = y
+
+    @abstractmethod
+    def info(self)-> str:
+        pass
+
+class LandNPC(NPC):
+    def info(self) -> str:
+        return f"Наземний NPC: {self.name} ({self.x},{self.y}), HP={self.hp}"
+
+class LandDecoration(Decoration):
+    def info(self)-> str:
+        return f"Наземна декорація: {self.type_name} ({self.x},{self.y})"
+
+class UnderwaterNPC(NPC):
+    def info(self)-> str:
+        return f"Підводний NPC: {self.name} ({self.x},{self.y}), HP={self.hp}"
+
+class UnderwaterDecoration(Decoration):
+    def info(self)-> str:
+        return f"Підводна декорація: {self.type_name} ({self.x},{self.y})"
+
+class GameFactory(ABC):
+    @abstractmethod
+    def create_npc(self, name)->NPC:
+        pass
+
+    @abstractmethod
+    def create_decoration(self, type_name)->Decoration:
+        pass
+
+class LandFactory(GameFactory):
+    def create_npc(self, name)->LandNPC:
+        return LandNPC(name, random.randint(0, 9), random.randint(0, 9), random.randint(50, 100))
+
+    def create_decoration(self, type_name)->LandDecoration:
+        return LandDecoration(type_name, random.randint(0, 9), random.randint(0, 9))
+
+class UnderwaterFactory(GameFactory):
+    def create_npc(self, name)->UnderwaterNPC:
+        return UnderwaterNPC(name, random.randint(0, 9), random.randint(0, 9), random.randint(50, 100))
+
+    def create_decoration(self, type_name)->UnderwaterDecoration:
+        return UnderwaterDecoration(type_name, random.randint(0, 9), random.randint(0, 9))
+
+class GameLevel:
+    def __init__(self, width:int, height:int, factory: GameFactory)->None:
+        self.width:int = width
+        self.height:int = height
+        self.factory: GameFactory = factory
+        self.map: list[list[str]]= [["." for i in range(width)] for j in range(height)]
+        self.objects : list[NPC | Decoration]= []
+
+    def add_object(self, obj: NPC | Decoration)->None:
+        self.objects.append(obj)
+        if 0 <= obj.y < self.height and 0 <= obj.x < self.width:
+            symbol:str = "N" if isinstance(obj, NPC) else "D"
+            self.map[obj.y][obj.x] = symbol
+
+    def display(self)->None:
+        for row in self.map:
+            print(" ".join(row))
+        print("\n Об’єкти рівня:")
+        for obj in self.objects:
+            print(obj.info())
+
+def main()->None:
+    print("Виберіть тип рівня ")
+    print("1. Наземний рівень")
+    print("2. Підводний рівень")
+    choice = input("Ваш вибір: ")
+
+    if choice == "1":
+        factory = LandFactory()
+        print(" Створено наземний рівень!")
+    else:
+        factory = UnderwaterFactory()
+        print(" Створено підводний рівень!")
+
+    level = GameLevel(width=10, height=10, factory=factory)
+
+    npc1 = factory.create_npc("Ork")
+    npc2 = factory.create_npc("Elf")
+    deco1 = factory.create_decoration("Tree")
+    deco2 = factory.create_decoration("Rock")
+
+    
+    for obj in [npc1, npc2, deco1, deco2]:
+        level.add_object(obj)
+
+    print("\n=== Поточна карта ===")
+    level.display()
+
+if __name__ == "__main__":
+    main()
+
