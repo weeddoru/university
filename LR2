@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 from typing import List, Union, Optional
 import random
 
-# Абстрактний клас NPC
 class NPC(ABC):
     def __init__(self, name: str, x: int, y: int, hp: int) -> None:
         self.name: str = name
@@ -20,7 +19,6 @@ class NPC(ABC):
     def info(self) -> str:
         pass
 
-# Абстрактний клас декорації
 class Decoration(ABC):
     def __init__(self, type_name: str, x: int, y: int) -> None:
         self.type_name: str = type_name
@@ -31,7 +29,6 @@ class Decoration(ABC):
     def info(self) -> str:
         pass
 
-# Наземні об'єкти
 class LandNPC(NPC):
     def info(self) -> str:
         return f"Наземний NPC: {self.name} ({self.x},{self.y}), HP={self.hp}"
@@ -40,7 +37,6 @@ class LandDecoration(Decoration):
     def info(self) -> str:
         return f"Наземна декорація: {self.type_name} ({self.x},{self.y})"
 
-# Підводні об'єкти
 class UnderwaterNPC(NPC):
     def info(self) -> str:
         return f"Підводний NPC: {self.name} ({self.x},{self.y}), HP={self.hp}"
@@ -49,7 +45,6 @@ class UnderwaterDecoration(Decoration):
     def info(self) -> str:
         return f"Підводна декорація: {self.type_name} ({self.x},{self.y})"
 
-# Абстрактна фабрика
 class GameFactory(ABC):
     @abstractmethod
     def create_npc(self, name: str) -> NPC:
@@ -59,7 +54,6 @@ class GameFactory(ABC):
     def create_decoration(self, type_name: str) -> Decoration:
         pass
 
-# Наземна фабрика
 class LandFactory(GameFactory):
     def create_npc(self, name: str) -> LandNPC:
         return LandNPC(name, random.randint(0, 9), random.randint(0, 9), random.randint(50, 100))
@@ -75,7 +69,6 @@ class UnderwaterFactory(GameFactory):
     def create_decoration(self, type_name: str) -> UnderwaterDecoration:
         return UnderwaterDecoration(type_name, random.randint(0, 9), random.randint(0, 9))
 
-# Клас рівня гри
 class GameLevel:
     def __init__(self, width: int, height: int, factory: GameFactory) -> None:
         self.width: int = width
@@ -107,7 +100,6 @@ class GameLevel:
         for obj in self.objects:
             print(obj.info())
 
-# Демонстрація роботи системи
 def main() -> None:
     land_npc_names: List[str] = ["Ork", "Elf", "Human", "Troll"]
     land_decorations: List[str] = ["Tree", "Rock", "House", "Bush"]
@@ -125,11 +117,14 @@ def main() -> None:
         npc_names: List[str] = land_npc_names
         deco_names: List[str] = land_decorations
         print("Створено наземний рівень!")
-    else:
+    elif choice == "2":
         factory = UnderwaterFactory()
         npc_names = water_npc_names
         deco_names = water_decorations
         print("Створено підводний рівень!")
+    else:
+        print("Помилка: вибрано неправильний рівень!")
+        return
 
     level: GameLevel = GameLevel(width=10, height=6, factory=factory)
 
