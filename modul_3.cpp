@@ -1,32 +1,57 @@
-//Знайти кількість додатніх і кількість від'ємних елементів.
+//У кожному варіанті дано двовимірний масив а[m][n] елементів (m стрічок,
+//n стовпчиків). Cтворити, відлагодити та протестувати програму для розв’язування задачі.
+//14.3.Знайти кількість додатніх і кількість від'ємних елементів.
 #include <iostream>
 using namespace std;
 
 int main() {
-    int n;
-    cout << "Enter the number of array elements: ";
+    int m, n;
+    cout << "Enter the number of rows (m): ";
+    cin >> m;
+    cout << "Enter the number of columns (n): ";
     cin >> n;
-    if (n <= 0) {
-    cout << "Incorrect number of elements!" << endl;
-    return 0;
+
+    if (m <= 0 || n <= 0) {
+        cout << "Invalid array size!" << endl;
+        return 0;
     }
 
-    int positiveCount = 0; 
-    int negativeCount = 0; 
+    double** a = new double*[m];  
+    for (int i = 0; i < m; ++i)
+        a[i] = new double[n];
 
-    cout << "Enter the array elements: " << endl;
-    for (int i = 0; i < n; ++i) {
-        double num;
-        cin >> num;
+    double sum = 0;
+    int total = 0;
 
-        if (num > 0)
-            positiveCount++;
-        else if (num < 0)
-            negativeCount++;
+    cout << "Enter the elements of the array:" << endl;
+    for (int i = 0; i < m; ++i) {
+        for (int j = 0; j < n; ++j) {
+            cout << "Enter element [" << i + 1 << "][" << j + 1 << "]: ";
+            cin >> a[i][j];
+            sum += a[i][j];
+            total++;
+        }
     }
 
-    cout << "Number of positive elements: " << positiveCount << endl;
-    cout << "Number of negative elements: " << negativeCount << endl;
+    double avg = sum / total; 
+
+    for (int i = 0; i < m; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (a[i][j] == 0)
+                a[i][j] = avg;
+        }
+    }
+
+    cout << "Array after replacing zeros:" << endl;
+    for (int i = 0; i < m; ++i) {
+        for (int j = 0; j < n; ++j)
+            cout << a[i][j] << " ";
+        cout << endl;
+    }
+
+    for (int i = 0; i < m; ++i)
+        delete[] a[i];
+    delete[] a;
 
     return 0;
 }
